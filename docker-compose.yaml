@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - "8080:8180"
+    command: ["-Djboss.socket.binding.port-offset=100"]
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      DB_SCHEMA: public
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+      KEYCLOAK_SSL_REQUIRED: none
+      PROXY_ADDRESS_FORWARDING: "true"
+    volumes:
+      - ./realms/:/opt/jboss/keycloak/modules/system/layers/base/com/oracle/jdbc/main/driver
+    depends_on:
+      - postgres
+volumes:
+  postgres_data:
+    driver: local
+  realms:
+    driver: local
